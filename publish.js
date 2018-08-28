@@ -369,68 +369,70 @@ function buildNav(members) {
 }
 
 function buildMemberNav(items, itemHeading, itemsSeen, linktoFn) {
-  var nav = []
-  var conf = env.conf.templates || {}
+    var nav = []
+    var conf = env.conf.templates || {}
+    conf.default = conf.default || {}
+    if (items && items.length) {
+        var itemsNav = ""
+        // nav.push(buildNavHeading(itemHeading))
+        items.forEach(function(item) {
+            DEBUG_OUTPUT.push(JSON.stringify(item));
+            var methods = find({ kind: "function", memberof: item.longname })
+            var members = find({ kind: "member", memberof: item.longname })
+            var displayName
 
-  conf.default = conf.default || {}
-  if (items && items.length) {
-    var itemsNav = ""
-
-    items.forEach(function(item) {
-      var fullItem = "";
-      var methods = find({ kind: "function", memberof: item.longname })
-      var members = find({ kind: "member", memberof: item.longname })
-      var displayName
-
-      if (!hasOwnProp.call(item, "longname")) {
-        fullItem += buildNavItem(linkfoFn('', item.name))
-        return
-      }
-
-      if (!hasOwnProp.call(itemsSeen, item.longname)) {
-        if (!!conf.default.useLongnameInNav) {
-          displayName = item.longname
-
-          if (conf.default.useLongnameInNav > 0 && conf.default.useLongnameInNav !== true) {
-            var num = conf.default.useLongnameInNav
-            var cropped = item.longname.split(".").slice(-num).join(".")
-            if (cropped !== displayName) {
-              displayName = "..." + cropped
-            }
-          }
-        } else {
-          displayName = item.name
-        }
-
-        displayName = displayName.replace(/^module:/g, "")
-
-        if (itemHeading === 'Tutorials') {
-          fullItem += buildNavItem(linktoFn(item.longname, displayName))
-        } else {
-          fullItem += buildNavHeading(buildNavType(item.kind, linktoFn(item.longname, displayName)))
-        }
-        if (members.length) {
-          members.forEach(function(member) {
-            fullItem += buildNavItem(buildNavType(member.kind, linkto(member.longname, member.name)))
-          })
-        }
-        if (methods.length) {
-          methods.forEach(function(method) {
-            if (method.inherited && conf.showInheritedInNav === false) {
-              return
+            if (!hasOwnProp.call(item, "longname")) {
+                nav.push(buildNavItem(linkfoFn('', item.name)))
+                return
             }
 
-            fullItem += buildNavItem(buildNavType(method.kind, linkto(method.longname, method.name)))
-          })
-        }
+            if (!hasOwnProp.call(itemsSeen, item.longname)) {
+                if (!!conf.default.useLongnameInNav) {
+                    displayName = item.longname
 
-        itemsSeen[item.longname] = true
-      }
-      nav.push(`<li class="tocheader"><ul>${fullItem}</ul></li>`);
-    })
-  }
+                    if (conf.default.useLongnameInNav > 0 && conf.default.useLongnameInNav !== true) {
+                        var num = conf.default.useLongnameInNav
+                        var cropped = item.longname.split(".").slice(-num).join(".")
+                        if (cropped !== displayName) {
+                            displayName = "..." + cropped
+                        }
+                    }
+                } else {
+                    displayName = item.name
+                }
 
-  return nav
+                if (hasOwnProp.call(item, "memberof")) {
+                    displayName = "."+displayName;
+                }
+                displayName = displayName.replace(/^module:/g, "")
+
+                if (itemHeading === 'Tutorials') {
+                    nav.push(buildNavItem(linktoFn(item.longname, displayName)))
+                } else {
+                    nav.push(buildNavHeading(buildNavType(item.kind, linktoFn(item.longname, displayName)),
+                    !hasOwnProp.call(item, "memberof")?'toctitle':''))
+                }
+                // if (members.length) {
+                //   members.forEach(function(member) {
+                //     fullItem += buildNavItem(buildNavType(member.kind, linkto(member.longname, member.name)))
+                //   })
+                // }
+                // if (methods.length) {
+                //   methods.forEach(function(method) {
+                //     if (method.inherited && conf.showInheritedInNav === false) {
+                //       return
+                //     }
+                //
+                //     fullItem += buildNavItem(buildNavType(method.kind, linkto(method.longname, method.name)))
+                //   })
+                // }
+
+                itemsSeen[item.longname] = true
+            }
+        })
+    }
+
+    return '<li class="tocheader"><ul>'+nav.join("")+"</ul></li>"
 }
 
 function linktoTutorial(longName, name) {
@@ -464,12 +466,9 @@ function buildNavLink (linkClass, linkContent) {
  * @param {String} content navigation header content
  * @return {String}
  */
-function buildNavHeading (content) {
-  return [
-    '<li class="toctitle">',
-    content,
-    '</li>'
-  ].join('')
+function buildNavHeading (content,cssClass) {
+  cssClass = cssClass||"";
+  return `<li class="${cssClass}">${content}</li>`
 }
 
 /**
@@ -497,6 +496,9 @@ function buildNavType (type, typeLink) {
   // ].join('')
 }
 
+var DEBUG_OUTPUT;
+
+
 /**
   @param {TAFFY} taffyData See <http://taffydb.com/>.
   @param {object} opts
@@ -504,7 +506,7 @@ function buildNavType (type, typeLink) {
  */
 exports.publish = function(taffyData, opts, tutorials) {
   data = taffyData
-
+  DEBUG_OUTPUT = [];
   var conf = env.conf.templates || {}
   conf.default = conf.default || {}
 
@@ -828,4 +830,8 @@ exports.publish = function(taffyData, opts, tutorials) {
   }
 
   saveChildren(tutorials)
+
+
+  var ofs = require("fs");
+  ofs.writeFileSync("/tmp/out.log",DEBUG_OUTPUT.join("\n"));
 }
