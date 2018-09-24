@@ -58,6 +58,27 @@
 
 
 <div class="widget">
+    <div class="col-6-12">
+        <h3>Methods</h3>
+        <table>
+            <tbody>
+                <?js
+                    var methods = self.find({kind: 'function', memberof: isGlobalPage ? {isUndefined: true} : doc.longname});
+                    if (methods && methods.length && methods.forEach) {
+                ?>
+                    <?js methods.forEach(function(m) { ?>
+                        <tr><td><?js var sig = m.name+"( ";
+                        if (m.params) {
+                            sig += m.params.filter(function(a) { return !/\./.test(a.name) }).map(function(a) { return a.name }).join(", ")
+                        }
+                        sig += " )";?><?js=
+                        self.linkto(m.longname, sig)
+                        ?></td></tr>
+                    <?js }); ?>
+                <?js } ?>
+            </tbody>
+         </table>
+     </div>
      <div class="col-6-12">
          <h3>Members</h3>
          <table>
@@ -80,21 +101,6 @@
             </tbody>
          </table>
     </div>
-    <div class="col-6-12">
-        <h3>Methods</h3>
-        <table>
-            <tbody>
-                <?js
-                    var methods = self.find({kind: 'function', memberof: isGlobalPage ? {isUndefined: true} : doc.longname});
-                    if (methods && methods.length && methods.forEach) {
-                ?>
-                    <?js methods.forEach(function(m) { ?>
-                        <tr><td><?js= self.linkto(m.longname, m.name) ?></td></tr>
-                    <?js }); ?>
-                <?js } ?>
-            </tbody>
-         </table>
-     </div>
 </div>
 <br style="clear:both" />
 
