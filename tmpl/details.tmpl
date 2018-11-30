@@ -64,15 +64,15 @@ if (data.defaultvalue && (data.defaultvaluetype === 'object' || data.defaultvalu
     </ul></dd>
     <?js } ?>
 
-    <?js if (data.mixes && data.mixes.length) { ?>
-        <dt class="mixes">Mixes In:</dt>
+    <!-- <?js if (data.mixes && data.mixes.length) { ?>
+        <dt class="mixes">See:</dt>
 
         <dd class="mixes"><ul>
         <?js data.mixes.forEach(function(a) { ?>
             <li><?js= self.linkto(a, a) ?></li>
         <?js }); ?>
         </ul></dd>
-    <?js } ?>
+    <?js } ?> -->
 
     <?js if (data.deprecated) { ?>
         <dt class="important tag-deprecated">Deprecated:</dt><?js

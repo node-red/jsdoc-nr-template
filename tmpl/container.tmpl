@@ -21,7 +21,7 @@
 
 <header>
         <h2><?js if (doc.ancestors && doc.ancestors.length) { ?>
-            <span class="ancestors"><?js= doc.ancestors.join('') ?></span><?js } ?><?js= doc.name ?>
+            <span class="ancestors"><?js= doc.ancestors.join('') ?></span><?js } ?><?js= (doc.name||"").replace(/_/g,".") ?>
         <?js if (doc.variation) { ?>
             <sup class="variation"><?js= doc.variation ?></sup>
         <?js } ?></h2>
@@ -57,32 +57,8 @@
     </div>
 
 
-<div class="widget">
-    <div class="col-6-12">
-        <h3>Methods</h3>
-        <table>
-            <tbody>
-                <?js
-                    var methods = self.find({kind: 'function', memberof: isGlobalPage ? {isUndefined: true} : doc.longname});
-                    if (methods && methods.length && methods.forEach) {
-                ?>
-                    <?js methods.forEach(function(m) { ?>
-                        <tr><td><?js var sig = m.name+"( ";
-                        if (m.params) {
-                            sig += m.params.filter(function(a) { return !/\./.test(a.name) }).map(function(a) { return a.name }).join(", ")
-                        }
-                        sig += " )";?><?js=
-                        self.linkto(m.longname, sig)
-                        ?></td></tr>
-                    <?js }); ?>
-                <?js } ?>
-            </tbody>
-         </table>
-     </div>
+<div class="widget" style="padding-bottom: 40px; border-bottom: 1px solid #eee;">
      <div class="col-6-12">
-         <h3>Members</h3>
-         <table>
-             <tbody>
                 <?js
                     var members = self.find({kind: 'member', memberof: isGlobalPage ? {isUndefined: true} : doc.longname});
 
@@ -94,65 +70,37 @@
                     }
                     if (members && members.length && members.forEach) {
                 ?>
+                <table>
+                    <tbody>
                     <?js members.forEach(function(p) { ?>
                         <tr><td><?js= self.linkto(p.longname, p.name) ?></td></tr>
                     <?js }); ?>
-                <?js } ?>
             </tbody>
          </table>
+         <?js } ?>
     </div>
+    <div class="col-6-12">
+        <?js
+            var methods = self.find({kind: 'function', memberof: isGlobalPage ? {isUndefined: true} : doc.longname});
+            if (methods && methods.length && methods.forEach) {
+        ?>
+        <table>
+            <tbody>
+                    <?js methods.forEach(function(m) { ?>
+                        <tr><td><?js var sig = m.name+"( ";
+                        if (m.params) {
+                            sig += m.params.filter(function(a) { return !/\./.test(a.name) }).map(function(a) { return a.name }).join(", ")
+                        }
+                        sig += " )";?><?js=
+                        self.linkto(m.longname, sig)
+                        ?></td></tr>
+                    <?js }); ?>
+            </tbody>
+         </table>
+         <?js } ?>
+     </div>
+    <br style="clear:both" />
 </div>
-<br style="clear:both" />
-
-    <?js if (doc.augments && doc.augments.length) { ?>
-        <h3 class="subsection-title">Extends</h3>
-
-        <?js= self.partial('augments.tmpl', doc) ?>
-    <?js } ?>
-
-    <?js if (doc.kind === 'module' && doc.requires && doc.requires.length) { ?>
-        <h3 class="subsection-title">Requires</h3>
-
-        <ul><?js doc.requires.forEach(function(r) { ?>
-            <li><?js= self.linkto(r, r) ?></li>
-        <?js }); ?></ul>
-    <?js } ?>
-
-    <?js
-        var classes = self.find({kind: 'class', memberof: doc.longname});
-        if (!isGlobalPage && classes && classes.length) {
-    ?>
-        <h3 class="subsection-title">Classes</h3>
-
-        <dl><?js classes.forEach(function(c) { ?>
-            <dt><?js= self.linkto(c.longname, c.name) ?></dt>
-            <dd><?js if (c.summary) { ?><?js= c.summary ?><?js } ?></dd>
-        <?js }); ?></dl>
-    <?js } ?>
-
-     <?js
-        var mixins = self.find({kind: 'mixin', memberof: doc.longname});
-        if (!isGlobalPage && mixins && mixins.length) {
-    ?>
-        <h3 class="subsection-title">Mixins</h3>
-
-        <dl><?js mixins.forEach(function(m) { ?>
-            <dt><?js= self.linkto(m.longname, m.name) ?></dt>
-            <dd><?js if (m.summary) { ?><?js= m.summary ?><?js } ?></dd>
-        <?js }); ?></dl>
-    <?js } ?>
-
-    <?js
-        var namespaces = self.find({kind: 'namespace', memberof: doc.longname});
-        if (!isGlobalPage && namespaces && namespaces.length) {
-    ?>
-        <h3 class="subsection-title">Namespaces</h3>
-
-        <dl><?js namespaces.forEach(function(n) { ?>
-            <dt><?js= self.linkto(n.longname, n.name) ?></dt>
-            <dd><?js if (n.summary) { ?><?js= n.summary ?><?js } ?></dd>
-        <?js }); ?></dl>
-    <?js } ?>
 
     <?js
         var members = self.find({kind: 'member', memberof: isGlobalPage ? {isUndefined: true} : doc.longname});
@@ -165,8 +113,6 @@
         }
         if (members && members.length && members.forEach) {
     ?>
-        <h3 class="subsection-title">Members</h3>
-
         <?js members.forEach(function(p) { ?>
             <?js= self.partial('members.tmpl', p) ?>
         <?js }); ?>
@@ -176,8 +122,6 @@
         var methods = self.find({kind: 'function', memberof: isGlobalPage ? {isUndefined: true} : doc.longname});
         if (methods && methods.length && methods.forEach) {
     ?>
-        <h3 class="subsection-title">Methods</h3>
-
         <?js methods.forEach(function(m) { ?>
             <?js= self.partial('method.tmpl', m) ?>
         <?js }); ?>

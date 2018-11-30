@@ -344,14 +344,23 @@ function buildNav(members) {
 
   nav.push(buildNavLink('home', '<a href="index.html">Home</a>'))
 
-  nav = nav.concat(buildMemberNav(members.tutorials, "Tutorials", seenTutorials, linktoTutorial))
-  nav = nav.concat(buildMemberNav(members.classes, "Classes", seen, linkto))
-  nav = nav.concat(buildMemberNav(members.modules, "Modules", {}, linkto))
-  nav = nav.concat(buildMemberNav(members.externals, "Externals", seen, linktoExternal))
-  nav = nav.concat(buildMemberNav(members.events, "Events", seen, linkto))
+  // nav = nav.concat(buildMemberNav(members.tutorials, "Tutorials", seenTutorials, linktoTutorial))
+  // nav = nav.concat(buildMemberNav(members.classes, "Classes", seen, linkto))
+  // nav = nav.concat(buildMemberNav(members.modules, "Modules", {}, linkto))
+  // nav = nav.concat(buildMemberNav(members.externals, "Externals", seen, linktoExternal))
+  // nav = nav.concat(buildMemberNav(members.events, "Events", seen, linkto))
+  members.namespaces.sort(function(A,B) {
+      if (A.longname[0] === '@') {
+          if (B.longname[0] === '@') {
+              return A.longname.localeCompare(B.longname);
+          }
+          return 1;
+      }
+      return -1;
+  })
   nav = nav.concat(buildMemberNav(members.namespaces, "Namespaces", seen, linkto))
-  nav = nav.concat(buildMemberNav(members.mixins, "Mixins", seen, linkto))
-  nav = nav.concat(buildMemberNav(members.interfaces, "Interfaces", seen, linkto))
+  // nav = nav.concat(buildMemberNav(members.mixins, "Mixins", seen, linkto))
+  // nav = nav.concat(buildMemberNav(members.interfaces, "Interfaces", seen, linkto))
 
   if (members.globals.length) {
     nav.push(buildNavHeading(linkto('global', 'Globals')))
@@ -376,7 +385,6 @@ function buildMemberNav(items, itemHeading, itemsSeen, linktoFn) {
         var itemsNav = ""
         // nav.push(buildNavHeading(itemHeading))
         items.forEach(function(item) {
-            DEBUG_OUTPUT.push(JSON.stringify(item));
             var methods = find({ kind: "function", memberof: item.longname })
             var members = find({ kind: "member", memberof: item.longname })
             var displayName
@@ -412,20 +420,23 @@ function buildMemberNav(items, itemHeading, itemsSeen, linktoFn) {
                     nav.push(buildNavHeading(buildNavType(item.kind, linktoFn(item.longname, displayName)),
                     !hasOwnProp.call(item, "memberof")?'toctitle':''))
                 }
-                // if (members.length) {
-                //   members.forEach(function(member) {
-                //     fullItem += buildNavItem(buildNavType(member.kind, linkto(member.longname, member.name)))
-                //   })
-                // }
-                // if (methods.length) {
-                //   methods.forEach(function(method) {
-                //     if (method.inherited && conf.showInheritedInNav === false) {
-                //       return
-                //     }
-                //
-                //     fullItem += buildNavItem(buildNavType(method.kind, linkto(method.longname, method.name)))
-                //   })
-                // }
+                if (members.length) {
+                  members.forEach(function(member) {
+                      var linkTarget = member.longname;
+                      if (member.mixes && member.mixes.length) {
+                          linkTarget = member.mixes[0];
+                      }
+                    nav.push(buildNavItem(buildNavType(member.kind, linkto(linkTarget, member.name))))
+                  })
+                }
+                if (methods.length) {
+                  methods.forEach(function(method) {
+                    if (method.inherited && conf.showInheritedInNav === false) {
+                      return
+                    }
+                    nav.push(buildNavItem(buildNavType(method.kind, linkto(method.longname, method.name+"(...)"))));
+                  })
+                }
 
                 itemsSeen[item.longname] = true
             }
@@ -496,9 +507,6 @@ function buildNavType (type, typeLink) {
   // ].join('')
 }
 
-var DEBUG_OUTPUT;
-
-
 /**
   @param {TAFFY} taffyData See <http://taffydb.com/>.
   @param {object} opts
@@ -506,7 +514,6 @@ var DEBUG_OUTPUT;
  */
 exports.publish = function(taffyData, opts, tutorials) {
   data = taffyData
-  DEBUG_OUTPUT = [];
   var conf = env.conf.templates || {}
   conf.default = conf.default || {}
 
@@ -831,7 +838,4 @@ exports.publish = function(taffyData, opts, tutorials) {
 
   saveChildren(tutorials)
 
-
-  var ofs = require("fs");
-  ofs.writeFileSync("/tmp/out.log",DEBUG_OUTPUT.join("\n"));
 }
