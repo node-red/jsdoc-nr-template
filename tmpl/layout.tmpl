@@ -7,16 +7,29 @@
 
     <script src="scripts/prettify/prettify.js"></script>
     <script src="scripts/prettify/lang-css.js"></script>
+    <script src="scripts/jquery-3.3.1.min.js"></script>
     <link type="text/css" rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
     <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
     <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
-
     <link href="https://nodered.org/css/simplegrid.css" rel="stylesheet" media="screen">
     <link href="https://nodered.org/css/style.css" rel="stylesheet" media="screen">
     <link href="https://nodered.org/css/front.css" rel="stylesheet" media="screen">
     <link href="https://nodered.org/css/docs.css" rel="stylesheet" media="screen">
     <link href="https://nodered.org/css/blog.css" rel="stylesheet" media="screen">
     <link href="https://nodered.org/css/api.css" rel="stylesheet" media="screen">
+    <style>
+        .nav-item { font-size: 0.9em; display: none }
+        td:first-child span {
+            font-family: 'Open Sans', sans-serif;
+            font-size: 0.9em;
+            background: none;
+            border: none;
+            width: auto;
+            text-align: left;
+            display: inline-block;
+            margin-right: 10px;
+        }
+    </style>
 </head>
 <body>
 
@@ -99,7 +112,12 @@
 </div>
 
 
-<script>prettyPrint();</script>
+<script>
+    var file = window.location.pathname.split("/").pop();
+    $(".toctitle > a[href='"+file+"']").parent().addClass('active');
+    $(".nav-item > a[href^='"+file+"']").parent().show();
+    prettyPrint();
+</script>
 <script src="scripts/linenumber.js"></script>
 </body>
 </html>

@@ -196,11 +196,11 @@ function addSignatureReturns(f) {
 function addSignatureTypes(f) {
   var types = f.type ? buildItemTypeStrings(f) : []
 
-  f.signature =
-    (f.signature || "") +
-    '<span class="type-signature">' +
-    (types.length ? " :" + types.join("|") : "") +
-    "</span>"
+  if (f.mixes) {
+      types.push("{ "+linkto(f.mixes[0],"...")+" }")
+  }
+  var content = (types.length ? " : " + types.join("|") : "");
+  f.signature = (f.signature || "") + (content?('<span class="type-signature">'+content+"</span>"):"")
 }
 
 function addAttribs(f) {
@@ -420,12 +420,14 @@ function buildMemberNav(items, itemHeading, itemsSeen, linktoFn) {
                     nav.push(buildNavHeading(buildNavType(item.kind, linktoFn(item.longname, displayName)),
                     !hasOwnProp.call(item, "memberof")?'toctitle':''))
                 }
+                // nav.push('<li>member length '+members.length+'</li>');
                 if (members.length) {
                   members.forEach(function(member) {
                       var linkTarget = member.longname;
-                      if (member.mixes && member.mixes.length) {
-                          linkTarget = member.mixes[0];
-                      }
+                      // nav.push('<li> - '+member.name+' '+JSON.stringify(member.mixes)+'</li>');
+                      // if (member.mixes && member.mixes.length) {
+                      //     linkTarget = member.mixes[0];
+                      // }
                     nav.push(buildNavItem(buildNavType(member.kind, linkto(linkTarget, member.name))))
                   })
                 }
