@@ -342,7 +342,8 @@ function buildNav(members) {
   var seen = {}
   var seenTutorials = {}
 
-  nav.push(buildNavLink('home', '<a href="index.html">Home</a>'))
+
+  nav.push('<li class="active"><a href="index.html">Module APIs</a><li>');
 
   // nav = nav.concat(buildMemberNav(members.tutorials, "Tutorials", seenTutorials, linktoTutorial))
   // nav = nav.concat(buildMemberNav(members.classes, "Classes", seen, linkto))
