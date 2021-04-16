@@ -343,8 +343,8 @@ function buildNav(members) {
   var seenTutorials = {}
 
 
-  nav.push('<li class="active"><a href="index.html">Module APIs</a><li>');
-
+  nav.push('<li class="active"><a href="/docs/api/modules">Module APIs</a><li>');
+  nav.push('<li class="active"><a href="index.html">Version: '+process.env.NODE_RED_PACKAGE_VERSION+'</a><li>');
   // nav = nav.concat(buildMemberNav(members.tutorials, "Tutorials", seenTutorials, linktoTutorial))
   // nav = nav.concat(buildMemberNav(members.classes, "Classes", seen, linkto))
   // nav = nav.concat(buildMemberNav(members.modules, "Modules", {}, linkto))
@@ -707,7 +707,7 @@ exports.publish = function(taffyData, opts, tutorials) {
   view.tutoriallink = tutoriallink
   view.htmlsafe = htmlsafe
   view.outputSourceFiles = outputSourceFiles
-
+  view.apiVersion = process.env.NODE_RED_PACKAGE_VERSION
   // once for all
   view.nav = buildNav(members)
   attachModuleSymbols(find({ longname: { left: "module:" } }), members.modules)
